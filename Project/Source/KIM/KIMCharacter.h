@@ -18,12 +18,21 @@ public:
 	// Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+		USceneComponent* ObjectAttachmentPoint;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+		bool IsItemSnapping = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		float BaseLookRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float MovementSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float ThrowIntensity;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -42,6 +51,8 @@ public:
 	void LookUp(float Value);
 	void LookRight(float Value);
 	
+	void ThrowObject();
+
 	void Interact();
 
 	AActor* PickedUpItem;

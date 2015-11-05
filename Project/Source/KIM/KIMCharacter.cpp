@@ -12,6 +12,11 @@ AKIMCharacter::AKIMCharacter() {
 	CameraComponent->bUsePawnControlRotation = false;
 	CameraComponent->AddRelativeLocation(FVector(0, 0, 0));
 
+	ObjectAttachmentPoint = CreateDefaultSubobject<USceneComponent>(TEXT("InteractionObjectPoint"));
+	ObjectAttachmentPoint->AttachTo(RootComponent);
+	ObjectAttachmentPoint->AddRelativeLocation(FVector(0, 0, 0));
+
+
 	// Rotate when the controller rotates
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = true;
@@ -19,6 +24,7 @@ AKIMCharacter::AKIMCharacter() {
 
 	BaseLookRate = 45.f;
 	MovementSpeed = 100;
+	ThrowIntensity = 5000;
 	PickedUpItem = NULL;
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -33,7 +39,8 @@ void AKIMCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompon
 	InputComponent->BindAxis("MoveRight", this, &AKIMCharacter::MoveRight);
 	InputComponent->BindAxis("LookUp", this, &AKIMCharacter::LookUp);
 	InputComponent->BindAxis("LookRight", this, &AKIMCharacter::LookRight);
-
+	
+	InputComponent->BindAction("Throw", IE_Released, this, &AKIMCharacter::ThrowObject);
 	InputComponent->BindAction("Interact", IE_Released, this, &AKIMCharacter::Interact);
 
 }
@@ -89,6 +96,22 @@ void AKIMCharacter::LookUp(float Value) {
 void AKIMCharacter::LookRight(float Value) {
 	AddControllerYawInput(Value * BaseLookRate * GetWorld()->GetDeltaSeconds());
 }
+
+
+void AKIMCharacter::ThrowObject() {
+	if (PickedUpItem) {
+		PickedUpItem->DetachRootComponentFromParent(true);
+		((AKIMInteractionActor*)PickedUpItem)->Thrown(ThrowIntensity);
+		((AKIMInteractionActor*)PickedUpItem)->InteractionType = EKIMInteractionTypes::OnPickUp;
+		UE_LOG(LogClass, Warning, TEXT("Threw %s"), *PickedUpItem->GetName());
+
+		PickedUpItem = NULL;
+	}
+	else {
+		UE_LOG(LogClass, Warning, TEXT("Nothing to throw"));
+	}
+}
+
 #pragma endregion
 
 // Called when the game starts or when spawned
@@ -117,6 +140,8 @@ void AKIMCharacter::Interact() {
 	}
 	else if (outHit.GetActor() == NULL && PickedUpItem) {
 		PickedUpItem->DetachRootComponentFromParent(true);
+		((AKIMInteractionActor*)PickedUpItem)->Droped();
+		((AKIMInteractionActor*)PickedUpItem)->InteractionType = EKIMInteractionTypes::OnPickUp;
 		UE_LOG(LogClass, Warning, TEXT("Droped %s"), *PickedUpItem->GetName());
 		PickedUpItem = NULL;
 	}

@@ -43,6 +43,15 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
 		void Activated();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
+		void Thrown(float Intensity);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
+		void PickedUp();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
+		void Droped();
+
 	FTimerHandle handle;
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction") 
