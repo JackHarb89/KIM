@@ -22,6 +22,7 @@ AKIMCharacter::AKIMCharacter() {
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
+	InteractionDistance = 250.f;
 	BaseLookRate = 45.f;
 	BaseRotationRate = 45.f;
 	MovementSpeed = 100;
@@ -150,6 +151,7 @@ void AKIMCharacter::BeginPlay() {
 // Called every frame
 void AKIMCharacter::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
+	CheckTraceDistance();
 }
 
 void AKIMCharacter::Interact() {
@@ -168,10 +170,9 @@ void AKIMCharacter::Interact() {
 	params.AddIgnoredActor(PickedUpItem);
 
 	FVector TraceStart = CameraComponent->GetComponentLocation();
-	FVector TraceEnd = TraceStart + (CameraComponent->GetForwardVector() * 250);
+	FVector TraceEnd = TraceStart + (CameraComponent->GetForwardVector() * InteractionDistance);
 
 	GetWorld()->LineTraceSingleByChannel(outHit, TraceStart, TraceEnd, ECollisionChannel::ECC_PhysicsBody, params);
-	//GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(GetController(), outHit.Location);
 
 	if (outHit.GetActor() != NULL && outHit.GetActor()->GetClass()->IsChildOf(AKIMInteractionActor::StaticClass())) {
 		AKIMInteractionActor* InteractionActor = ((AKIMInteractionActor*)outHit.GetActor());
@@ -185,4 +186,34 @@ void AKIMCharacter::Interact() {
 		UE_LOG(LogClass, Warning, TEXT("Droped %s"), *PickedUpItem->GetName());
 		PickedUpItem = NULL;
 	}
+}
+
+
+void AKIMCharacter::CheckTraceDistance() {
+	if (IsInRoationState) {
+		return;
+	}
+
+	FHitResult outHit;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+	params.AddIgnoredActor(PickedUpItem);
+
+	FVector TraceStart = CameraComponent->GetComponentLocation();
+	FVector TraceEnd = TraceStart + (CameraComponent->GetForwardVector() * InteractionDistance);
+
+	GetWorld()->LineTraceSingleByChannel(outHit, TraceStart, TraceEnd, ECollisionChannel::ECC_PhysicsBody, params);
+	if (outHit.GetActor() != NULL && outHit.GetActor()->GetClass()->IsChildOf(AKIMInteractionActor::StaticClass())) {
+		if (((AKIMInteractionActor*)outHit.GetActor())->InteractionType != StoredType){
+			StoredType = ((AKIMInteractionActor*)outHit.GetActor())->InteractionType;
+			SwitchIconState(StoredType);
+		}
+	}
+	else {
+		if (StoredType != EKIMInteractionTypes::NONE) {
+			StoredType = EKIMInteractionTypes::NONE;
+			SwitchIconState(StoredType);
+		}
+	}
+
 }

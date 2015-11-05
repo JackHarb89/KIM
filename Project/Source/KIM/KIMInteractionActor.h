@@ -6,15 +6,6 @@
 #include "KIMCharacter.h"
 #include "KIMInteractionActor.generated.h"
 
-UENUM(BlueprintType)
-enum class EKIMInteractionTypes : uint8 {
-	NONE		= 0		UMETA(DisplayName = "NONE"),
-	OnCombine   = 1		UMETA(DisplayName = "OnCombine"),
-	OnPickUp	= 2		UMETA(DisplayName = "OnPickUp"),
-	OnPressed	= 3		UMETA(DisplayName = "OnPressed"),
-	OnRotation	= 4		UMETA(DisplayName = "OnRotation"),
-};
-
 UCLASS()
 class KIM_API AKIMInteractionActor : public AActor
 {

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "KIMInteractionStates.h"
 #include "KIMCharacter.generated.h"
 
 UCLASS()
@@ -59,7 +60,7 @@ public:
 	AActor* PickedUpItem;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float BaseRotationRate;
 
 	// Rotate
@@ -67,4 +68,12 @@ public:
 	void RotateRight(float Value);
 
 	bool IsInRoationState = false;
+
+	void CheckTraceDistance();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float InteractionDistance;
+	EKIMInteractionTypes StoredType = EKIMInteractionTypes::NONE;;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+		void SwitchIconState(EKIMInteractionTypes Type);
 };
