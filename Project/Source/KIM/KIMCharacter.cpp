@@ -18,7 +18,7 @@ AKIMCharacter::AKIMCharacter() {
 	bUseControllerRotationRoll = false;
 
 	BaseLookRate = 45.f;
-
+	MovementSpeed = 100;
 	PickedUpItem = NULL;
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -48,6 +48,7 @@ void AKIMCharacter::MoveForward(float Value) {
 		}
 		else return;
 	}
+	Value *= abs(MovementSpeed / 100);
 
 	// find out which way is forward
 	const FRotator Rotation = Controller->GetControlRotation();
@@ -68,6 +69,9 @@ void AKIMCharacter::MoveRight(float Value) {
 		}
 		else return;
 	}
+
+	Value *= abs(MovementSpeed / 100);
+
 	// find out which way is right
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);

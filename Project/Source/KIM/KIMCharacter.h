@@ -16,11 +16,14 @@ public:
 
 	// Components
 	// Camera
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* CameraComponent;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		float BaseLookRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float MovementSpeed;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
