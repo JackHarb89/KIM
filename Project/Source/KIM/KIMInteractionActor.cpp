@@ -11,7 +11,7 @@ AKIMInteractionActor::AKIMInteractionActor() {
 	Weight = 50;
 
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
@@ -23,7 +23,14 @@ void AKIMInteractionActor::BeginPlay() {
 // Called every frame
 void AKIMInteractionActor::Tick( float DeltaTime ) {
 	Super::Tick( DeltaTime );
-
+	if (IsAnimationEnabled){
+		if (IsPickedUp) {
+			AnimatePickUp(DeltaTime*10);
+		}
+		else {
+			AnimateLayBack(DeltaTime * 10);
+		}
+	}
 }
 
 
@@ -68,10 +75,47 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character) {
 	case (EKIMInteractionTypes::OnPressed) :
 		Activated();
 		break;
+	case (EKIMInteractionTypes::OnRotation) :
+		IsAnimationEnabled = true;
+		StoredTransform = GetTransform();
+		TargetTransform = Character->ObjectAttachmentPoint->GetComponentTransform();
+		IsPickedUp = true;
+		Character->IsInRoationState = IsPickedUp;
+		Character->PickedUpItem = this;
+		break;
+	}
+}
+
+void AKIMInteractionActor::FinishCharging() {
+	InteractionType = EKIMInteractionTypes::OnPickUp;
+}
+
+
+void AKIMInteractionActor::AnimatePickUp(float DeltaSeconds) {
+	SetActorLocation(FMath::Lerp(GetActorLocation(), TargetTransform.GetLocation(), DeltaSeconds));
+	SetActorRotation(FMath::Lerp(GetActorRotation().Quaternion(), TargetTransform.GetRotation(), DeltaSeconds));
+
+	if (GetActorLocation().Equals(TargetTransform.GetLocation(), 1) && GetActorRotation().Equals(TargetTransform.GetRotation().Rotator(), 1)) {
+		SetActorLocation(TargetTransform.GetLocation());
+		SetActorRotation(TargetTransform.GetRotation());
+		IsAnimationEnabled = false;
+		UE_LOG(LogClass, Warning, TEXT("PickUp Animation Finished"));
+	}
+}
+
+void AKIMInteractionActor::AnimateLayBack(float DeltaSeconds) {
+	SetActorLocation(FMath::Lerp(GetActorLocation(), StoredTransform.GetLocation(), DeltaSeconds));
+	SetActorRotation(FMath::Lerp(GetActorRotation().Quaternion(), StoredTransform.GetRotation(), DeltaSeconds));
+	if (GetActorLocation().Equals(StoredTransform.GetLocation(), 1) && GetActorRotation().Equals(StoredTransform.GetRotation().Rotator(), 1)) {
+		SetActorLocation(StoredTransform.GetLocation());
+		SetActorRotation(StoredTransform.GetRotation());
+		IsAnimationEnabled = false;
+		UE_LOG(LogClass, Warning, TEXT("LayBack Animation Finished"));
 	}
 }
 
 
-void AKIMInteractionActor::FinishCharging() {
-	InteractionType = EKIMInteractionTypes::OnPickUp;
+void AKIMInteractionActor::LayBack() {
+	IsAnimationEnabled = true;
+	IsPickedUp = false;
 }

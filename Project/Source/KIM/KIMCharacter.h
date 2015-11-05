@@ -28,6 +28,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		float BaseLookRate;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float MovementSpeed;
 
@@ -56,4 +57,14 @@ public:
 	void Interact();
 
 	AActor* PickedUpItem;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+		float BaseRotationRate;
+
+	// Rotate
+	void RotateUp(float Value);
+	void RotateRight(float Value);
+
+	bool IsInRoationState = false;
 };

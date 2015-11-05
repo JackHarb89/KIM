@@ -23,6 +23,7 @@ AKIMCharacter::AKIMCharacter() {
 	bUseControllerRotationRoll = false;
 
 	BaseLookRate = 45.f;
+	BaseRotationRate = 45.f;
 	MovementSpeed = 100;
 	ThrowIntensity = 5000;
 	PickedUpItem = NULL;
@@ -46,60 +47,87 @@ void AKIMCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompon
 }
 
 void AKIMCharacter::MoveForward(float Value) {
-	if (PickedUpItem) {
-		if (Value < -0.1f) {
-			Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+	if (Value < -0.1f || Value > 0.1f) {
+		if (IsInRoationState) {
+			RotateUp(Value);
+			return;
 		}
-		else if (Value > 0.1f){
-			Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+		if (PickedUpItem) {
+			if (Value < -0.1f) {
+				Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+			}
+			else if (Value > 0.1f) {
+				Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+			}
+			else return;
 		}
-		else return;
+		Value *= abs(MovementSpeed / 100);
+
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get forward vector
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(Direction, Value);
 	}
-	Value *= abs(MovementSpeed / 100);
-
-	// find out which way is forward
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-	// get forward vector
-	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	AddMovementInput(Direction, Value);
 }
 
 void AKIMCharacter::MoveRight(float Value) {
-	if (PickedUpItem) {
-		if (Value < -0.1f) {
-			Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+	if (Value < -0.1f || Value > 0.1f) {
+		if (IsInRoationState) {
+			RotateRight(Value);
+			return;
 		}
-		else if (Value > 0.1f) {
-			Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+		if (PickedUpItem) {
+			if (Value < -0.1f) {
+				Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+			}
+			else if (Value > 0.1f) {
+				Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+			}
+			else return;
 		}
-		else return;
+
+		Value *= abs(MovementSpeed / 100);
+
+		// find out which way is right
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get right vector 
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// add movement in that direction
+		AddMovementInput(Direction, Value);
 	}
-
-	Value *= abs(MovementSpeed / 100);
-
-	// find out which way is right
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-	// get right vector 
-	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	// add movement in that direction
-	AddMovementInput(Direction, Value);
 }
 
 void AKIMCharacter::LookUp(float Value) {
+	if (IsInRoationState) {
+		return;
+	}
 	AddControllerPitchInput(Value * BaseLookRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AKIMCharacter::LookRight(float Value) {
+	if (IsInRoationState) {
+		return;
+	}
 	AddControllerYawInput(Value * BaseLookRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AKIMCharacter::RotateUp(float Value) {
+	if (((AKIMInteractionActor*)PickedUpItem)->IsAnimationEnabled) return;
+	PickedUpItem->AddActorWorldRotation(FRotator(0, 0, Value * BaseRotationRate * GetWorld()->GetDeltaSeconds()));
+}
+
+void AKIMCharacter::RotateRight(float Value) {
+	if (((AKIMInteractionActor*)PickedUpItem)->IsAnimationEnabled) return;
+	PickedUpItem->AddActorWorldRotation(FRotator(0, Value * BaseRotationRate * GetWorld()->GetDeltaSeconds(), 0));
+}
 
 void AKIMCharacter::ThrowObject() {
-	if (PickedUpItem) {
+	if (PickedUpItem && !IsInRoationState) {
 		PickedUpItem->DetachRootComponentFromParent(true);
 		((AKIMInteractionActor*)PickedUpItem)->Thrown(ThrowIntensity);
 		((AKIMInteractionActor*)PickedUpItem)->InteractionType = EKIMInteractionTypes::OnPickUp;
@@ -125,14 +153,26 @@ void AKIMCharacter::Tick(float DeltaTime) {
 }
 
 void AKIMCharacter::Interact() {
+	if (IsInRoationState && PickedUpItem) {
+			PickedUpItem->DetachRootComponentFromParent(true);
+			((AKIMInteractionActor*)PickedUpItem)->LayBack();
+			IsInRoationState = false;
+			UE_LOG(LogClass, Warning, TEXT("Layed Back %s"), *PickedUpItem->GetName());
+			PickedUpItem = NULL;
+			return;
+	}
+
 	FHitResult outHit;
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(this);
 	params.AddIgnoredActor(PickedUpItem);
+
 	FVector TraceStart = CameraComponent->GetComponentLocation();
 	FVector TraceEnd = TraceStart + (CameraComponent->GetForwardVector() * 250);
-	GetWorld()->LineTraceSingleByChannel(outHit, TraceStart, TraceEnd, ECollisionChannel::ECC_WorldDynamic, params);
-	GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(GetController(), outHit.Location);
+
+	GetWorld()->LineTraceSingleByChannel(outHit, TraceStart, TraceEnd, ECollisionChannel::ECC_PhysicsBody, params);
+	//GetWorld()->GetNavigationSystem()->SimpleMoveToLocation(GetController(), outHit.Location);
+
 	if (outHit.GetActor() != NULL && outHit.GetActor()->GetClass()->IsChildOf(AKIMInteractionActor::StaticClass())) {
 		AKIMInteractionActor* InteractionActor = ((AKIMInteractionActor*)outHit.GetActor());
 		InteractionActor->Interacted(this);

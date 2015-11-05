@@ -12,6 +12,7 @@ enum class EKIMInteractionTypes : uint8 {
 	OnCombine   = 1		UMETA(DisplayName = "OnCombine"),
 	OnPickUp	= 2		UMETA(DisplayName = "OnPickUp"),
 	OnPressed	= 3		UMETA(DisplayName = "OnPressed"),
+	OnRotation	= 4		UMETA(DisplayName = "OnRotation"),
 };
 
 UCLASS()
@@ -56,4 +57,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction") 
 		void FinishCharging();
+
+	FTransform StoredTransform;
+	FTransform TargetTransform;
+
+	bool IsAnimationEnabled = false;
+	bool IsPickedUp = false;
+
+	void LayBack();
+	
+	void AnimatePickUp(float DeltaSeconds);
+	void AnimateLayBack(float DeltaSeconds);
 };
