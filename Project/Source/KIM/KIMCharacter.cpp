@@ -23,7 +23,6 @@ AKIMCharacter::AKIMCharacter() {
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 #pragma region Basic Input
 // Called to bind functionality to input
@@ -40,6 +39,16 @@ void AKIMCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompon
 }
 
 void AKIMCharacter::MoveForward(float Value) {
+	if (PickedUpItem) {
+		if (Value < -0.1f) {
+			Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+		}
+		else if (Value > 0.1f){
+			Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+		}
+		else return;
+	}
+
 	// find out which way is forward
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -50,6 +59,15 @@ void AKIMCharacter::MoveForward(float Value) {
 }
 
 void AKIMCharacter::MoveRight(float Value) {
+	if (PickedUpItem) {
+		if (Value < -0.1f) {
+			Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+		}
+		else if (Value > 0.1f) {
+			Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+		}
+		else return;
+	}
 	// find out which way is right
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);

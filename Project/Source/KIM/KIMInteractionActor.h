@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
 		EKIMInteractionTypes InteractionType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float Weight;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
