@@ -57,7 +57,8 @@ public:
 
 	void Interact();
 
-	AActor* PickedUpItem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+		AActor* PickedUpItem;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
@@ -76,4 +77,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
 		void SwitchIconState(EKIMInteractionTypes Type);
+
+
+	// Room 1 Puzzle
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+		bool IsBatteryAcquired = true;
+
 };

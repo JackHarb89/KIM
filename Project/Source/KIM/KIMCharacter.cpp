@@ -118,12 +118,12 @@ void AKIMCharacter::LookRight(float Value) {
 }
 
 void AKIMCharacter::RotateUp(float Value) {
-	if (((AKIMInteractionActor*)PickedUpItem)->IsAnimationEnabled) return;
+	if (((AKIMInteractionActor*)PickedUpItem)->IsAnimationEnabled || ((AKIMInteractionActor*)PickedUpItem)->IsLerpingToDesiredRotation || ((AKIMInteractionActor*)PickedUpItem)->FoundDesiredRotation) return;
 	PickedUpItem->AddActorWorldRotation(FRotator(0, 0, Value * BaseRotationRate * GetWorld()->GetDeltaSeconds()));
 }
 
 void AKIMCharacter::RotateRight(float Value) {
-	if (((AKIMInteractionActor*)PickedUpItem)->IsAnimationEnabled) return;
+	if (((AKIMInteractionActor*)PickedUpItem)->IsAnimationEnabled || ((AKIMInteractionActor*)PickedUpItem)->IsLerpingToDesiredRotation || ((AKIMInteractionActor*)PickedUpItem)->FoundDesiredRotation) return;
 	PickedUpItem->AddActorWorldRotation(FRotator(0, Value * BaseRotationRate * GetWorld()->GetDeltaSeconds(), 0));
 }
 
@@ -156,11 +156,7 @@ void AKIMCharacter::Tick(float DeltaTime) {
 
 void AKIMCharacter::Interact() {
 	if (IsInRoationState && PickedUpItem) {
-			PickedUpItem->DetachRootComponentFromParent(true);
-			((AKIMInteractionActor*)PickedUpItem)->LayBack();
-			IsInRoationState = false;
-			UE_LOG(LogClass, Warning, TEXT("Layed Back %s"), *PickedUpItem->GetName());
-			PickedUpItem = NULL;
+			((AKIMInteractionActor*)PickedUpItem)->LayBack(this);
 			return;
 	}
 
@@ -176,8 +172,9 @@ void AKIMCharacter::Interact() {
 
 	if (outHit.GetActor() != NULL && outHit.GetActor()->GetClass()->IsChildOf(AKIMInteractionActor::StaticClass())) {
 		AKIMInteractionActor* InteractionActor = ((AKIMInteractionActor*)outHit.GetActor());
-		InteractionActor->Interacted(this);
+		InteractionActor->Interacted(this, outHit.GetComponent());
 		UE_LOG(LogClass, Warning, TEXT("Interacted with %s"), *outHit.GetActor()->GetName());
+		UE_LOG(LogClass, Warning, TEXT("(%s)"), *outHit.GetComponent()->GetName());
 	}
 	else if (outHit.GetActor() == NULL && PickedUpItem) {
 		PickedUpItem->DetachRootComponentFromParent(true);

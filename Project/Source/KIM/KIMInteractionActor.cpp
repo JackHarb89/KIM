@@ -31,25 +31,25 @@ void AKIMInteractionActor::Tick( float DeltaTime ) {
 			AnimateLayBack(DeltaTime * 10);
 		}
 	}
+	else {
+		if (IsPickedUp && InteractionType == EKIMInteractionTypes::OnRotation) {
+			if (!FoundDesiredRotation) {
+				CheckRotationForDesired();
+			}
+			if (IsLerpingToDesiredRotation) {
+				LerpToDesiredLocation(DeltaTime);
+			}
+		}
+	}
 }
 
 
-void AKIMInteractionActor::Interacted(AKIMCharacter* Character) {
+void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveComponent* Component) {
 	switch (InteractionType)
 	{
 	case (EKIMInteractionTypes::NONE) :
 		break;
 	case (EKIMInteractionTypes::OnCombine) :
-		/*if (Character->PickedUpItem && GetName().Contains("Station",ESearchCase::IgnoreCase)) {
-			PickUpAbleItem = (AKIMInteractionActor*) Character->PickedUpItem;
-			InteractionType = EKIMInteractionTypes::NONE;
-		}
-		if (Character->PickedUpItem) {
-			Character->PickedUpItem->DetachRootComponentFromParent(true);
-			Character->PickedUpItem->AttachRootComponentToActor(this, NAME_None, EAttachLocation::SnapToTarget);
-			Character->PickedUpItem = NULL;
-			Activated();
-		}*/
 		if (Character->PickedUpItem) {
 			Character->PickedUpItem->Destroy();
 			Character->PickedUpItem->DetachRootComponentFromParent(true);
@@ -57,25 +57,31 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character) {
 		}
 		break;
 	case (EKIMInteractionTypes::OnPickUp) :
-		/*if (GetName().Contains("Station", ESearchCase::IgnoreCase)) {
-			PickUpAbleItem->DetachRootComponentFromParent(true);
-			PickUpAbleItem->AttachRootComponentToActor(Character, NAME_None, EAttachLocation::KeepWorldPosition);
-			Character->PickedUpItem = PickUpAbleItem;
-			PickUpAbleItem = NULL;
-			InteractionType = EKIMInteractionTypes::OnCombine;
+		if (Character->PickedUpItem){
+			break;
 		}
-		else {
-			AttachRootComponentToActor(Character, NAME_None, EAttachLocation::KeepWorldPosition);
-			Character->PickedUpItem = this;
-		}*/
-		PickedUp();
 		AttachRootComponentTo(Character->ObjectAttachmentPoint, NAME_None, (Character->IsItemSnapping ? EAttachLocation::SnapToTarget : EAttachLocation::KeepWorldPosition));
 		Character->PickedUpItem = this;
+		PickedUp();
 		break;
 	case (EKIMInteractionTypes::OnPressed) :
-		Activated();
+		if (GetName().Contains("Control", ESearchCase::IgnoreCase) && IsDoorControlOpen && Character->IsBatteryAcquired){
+			PlacedBattery();
+		}
+		else if (GetName().Contains("Control", ESearchCase::IgnoreCase)) {
+			Activated(NULL);
+		}
+		else if (GetName().Contains("Screw", ESearchCase::IgnoreCase) && Character->PickedUpItem && Character->PickedUpItem->GetName().Contains("ScrewDriver", ESearchCase::IgnoreCase)) {
+			Activated(NULL);
+		}
+		else if (GetName().Contains("Locker", ESearchCase::IgnoreCase)) {
+			Activated(Component);
+		}
 		break;
 	case (EKIMInteractionTypes::OnRotation) :
+		if (Character->PickedUpItem) {
+			break;
+		}
 		IsAnimationEnabled = true;
 		StoredTransform = GetTransform();
 		TargetTransform = Character->ObjectAttachmentPoint->GetComponentTransform();
@@ -84,6 +90,7 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character) {
 		Character->PickedUpItem = this;
 		break;
 	}
+	StartDialogue();
 }
 
 void AKIMInteractionActor::FinishCharging() {
@@ -99,6 +106,7 @@ void AKIMInteractionActor::AnimatePickUp(float DeltaSeconds) {
 		SetActorLocation(TargetTransform.GetLocation());
 		SetActorRotation(TargetTransform.GetRotation());
 		IsAnimationEnabled = false;
+		TargetTransform.SetRotation(FRotator(GetActorRotation().Pitch * -1 + DesiredRotation.Pitch, GetActorRotation().Yaw  + DesiredRotation.Yaw, 0).Quaternion());
 		UE_LOG(LogClass, Warning, TEXT("PickUp Animation Finished"));
 	}
 }
@@ -115,7 +123,37 @@ void AKIMInteractionActor::AnimateLayBack(float DeltaSeconds) {
 }
 
 
-void AKIMInteractionActor::LayBack() {
-	IsAnimationEnabled = true;
-	IsPickedUp = false;
+void AKIMInteractionActor::LayBack(AKIMCharacter* Character) {
+	if (FoundDesiredRotation && InteractionType != EKIMInteractionTypes::NONE) {
+		InteractionType = EKIMInteractionTypes::NONE;
+		Activated(NULL);
+		if (GetName().Contains("Ghettoblaster", ESearchCase::IgnoreCase)) {
+			Character->IsBatteryAcquired = true;
+		}
+	}
+	else {
+		Character->PickedUpItem->DetachRootComponentFromParent(true);
+		Character->IsInRoationState = false;
+		Character->PickedUpItem = NULL;
+		IsAnimationEnabled = true;
+		IsPickedUp = false;
+		UE_LOG(LogClass, Warning, TEXT("Layed Back %s"), *GetName());
+	}
+}
+
+void AKIMInteractionActor::CheckRotationForDesired() {
+	if (GetActorRotation().Equals(TargetTransform.GetRotation().Rotator(), 25)) {
+		IsLerpingToDesiredRotation = true;
+		FoundDesiredRotation = true;
+		UE_LOG(LogClass, Warning, TEXT("Found desired rotation"));
+	}
+}
+
+void AKIMInteractionActor::LerpToDesiredLocation(float DeltaSeconds) {
+	SetActorRotation(FMath::Lerp(GetActorRotation().Quaternion(), TargetTransform.GetRotation(), DeltaSeconds));
+	if (GetActorRotation().Equals(TargetTransform.GetRotation().Rotator(), 1)) {
+		SetActorRotation(TargetTransform.GetRotation());
+		IsLerpingToDesiredRotation = false;
+		UE_LOG(LogClass, Warning, TEXT("Rotated to desire"));
+	}
 }

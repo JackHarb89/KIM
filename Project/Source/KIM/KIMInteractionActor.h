@@ -28,12 +28,12 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	void Interacted(AKIMCharacter* Character);
+	void Interacted(AKIMCharacter* Character, UPrimitiveComponent* Component);
 
 	AKIMInteractionActor* PickUpAbleItem = NULL;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
-		void Activated();
+		void Activated(UPrimitiveComponent* Component);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
 		void Thrown(float Intensity);
@@ -53,10 +53,32 @@ public:
 	FTransform TargetTransform;
 
 	bool IsAnimationEnabled = false;
-	bool IsPickedUp = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+		bool IsPickedUp = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+		bool FoundDesiredRotation = false;
 
-	void LayBack();
+	void LayBack(AKIMCharacter* Character);
 	
 	void AnimatePickUp(float DeltaSeconds);
 	void AnimateLayBack(float DeltaSeconds);
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		FRotator DesiredRotation = FRotator::ZeroRotator;
+
+	bool IsLerpingToDesiredRotation = false;
+
+	void CheckRotationForDesired();
+	void LerpToDesiredLocation(float DeltaSeconds);
+
+	// Room 1 Puzzle
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		bool IsDoorControlOpen = false;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
+		void PlacedBattery();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
+		void StartDialogue();
 };
