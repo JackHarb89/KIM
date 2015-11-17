@@ -81,6 +81,17 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
 		void PlacedBattery();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
-		void StartDialogue();
+
+	
+	// Dialogue
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
+		TArray<FKIMDialogue> DialogueTexts;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Dialogue")
+		void StartDialogue(const FName Dialogue);
+
+	UFUNCTION(BlueprintCallable, Category = "Dialogue")
+		void GetInteractionDialogue(const FName Interaction);
+
 };

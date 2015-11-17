@@ -12,3 +12,19 @@ enum class EKIMInteractionTypes : uint8 {
 	OnPressed = 3		UMETA(DisplayName = "OnPressed"),
 	OnRotation = 4		UMETA(DisplayName = "OnRotation"),
 };
+
+USTRUCT(BlueprintType)
+struct FKIMDialogue {
+	GENERATED_USTRUCT_BODY()
+
+public:
+	FKIMDialogue()
+			: Interaction("")
+			, Dialogue(""){
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
+		FName Interaction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
+		FName Dialogue;
+};

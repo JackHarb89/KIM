@@ -74,6 +74,9 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 		else if (GetName().Contains("Screw", ESearchCase::IgnoreCase) && Character->PickedUpItem && Character->PickedUpItem->GetName().Contains("ScrewDriver", ESearchCase::IgnoreCase)) {
 			Activated(NULL);
 		}
+		else if (GetName().Contains("Screw", ESearchCase::IgnoreCase)) {
+			GetInteractionDialogue("Press");
+		}
 		else if (GetName().Contains("Locker", ESearchCase::IgnoreCase)) {
 			Activated(Component);
 		}
@@ -91,9 +94,9 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 		IsPickedUp = true;
 		Character->IsInRoationState = IsPickedUp;
 		Character->PickedUpItem = this;
+		GetInteractionDialogue("OnPickup");
 		break;
 	}
-	StartDialogue();
 }
 
 void AKIMInteractionActor::FinishCharging() {
@@ -152,6 +155,7 @@ void AKIMInteractionActor::LayBack(AKIMCharacter* Character) {
 
 void AKIMInteractionActor::CheckRotationForDesired() {
 	if (GetActorRotation().Equals(TargetTransform.GetRotation().Rotator(), 25)) {
+		GetInteractionDialogue("FoundSpot");
 		IsLerpingToDesiredRotation = true;
 		FoundDesiredRotation = true;
 		UE_LOG(LogClass, Warning, TEXT("Found desired rotation"));
@@ -165,4 +169,21 @@ void AKIMInteractionActor::LerpToDesiredLocation(float DeltaSeconds) {
 		IsLerpingToDesiredRotation = false;
 		UE_LOG(LogClass, Warning, TEXT("Rotated to desire"));
 	}
+}
+
+
+void AKIMInteractionActor::GetInteractionDialogue(const FName Interaction) {
+	TArray<FName> Dialogues;
+	for (FKIMDialogue InteractionDialogue : DialogueTexts) {
+		if (InteractionDialogue.Interaction.Compare(Interaction) == 0) {
+			Dialogues.Add(InteractionDialogue.Dialogue);
+		}
+	}
+
+	if (Dialogues.Num() == 0) {
+		StartDialogue(TEXT("No Dialogue found!"));
+		return;
+	}
+
+	StartDialogue(Dialogues[FMath::RandRange(0, Dialogues.Num() - 1)]);
 }
