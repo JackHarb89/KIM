@@ -81,6 +81,6 @@ public:
 
 	// Room 1 Puzzle
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-		bool IsBatteryAcquired = true;
+		bool IsBatteryAcquired = false;
 
 };
