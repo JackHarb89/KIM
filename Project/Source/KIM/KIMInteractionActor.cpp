@@ -127,7 +127,13 @@ void AKIMInteractionActor::AnimateLayBack(float DeltaSeconds) {
 
 
 void AKIMInteractionActor::LayBack(AKIMCharacter* Character) {
-	if (FoundDesiredRotation && InteractionType != EKIMInteractionTypes::NONE) {
+	if (IsLerpingToDesiredRotation) {
+		return;
+	}
+	if (FoundDesiredRotation && !InteractionFinished && InteractionType != EKIMInteractionTypes::NONE) {
+		Activated(NULL);
+	}
+	else if (FoundDesiredRotation && InteractionType != EKIMInteractionTypes::NONE) {
 		InteractionType = EKIMInteractionTypes::NONE;
 		Activated(NULL);
 		if (GetName().Contains("Ghettoblaster", ESearchCase::IgnoreCase)) {

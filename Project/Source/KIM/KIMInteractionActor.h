@@ -57,6 +57,8 @@ public:
 		bool IsPickedUp = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
 		bool FoundDesiredRotation = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+		bool InteractionFinished = false;
 
 	void LayBack(AKIMCharacter* Character);
 	
