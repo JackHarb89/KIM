@@ -77,6 +77,10 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 		else if (GetName().Contains("Locker", ESearchCase::IgnoreCase)) {
 			Activated(Component);
 		}
+		else if (GetName().Contains("Door", ESearchCase::IgnoreCase)) {
+			Activated(NULL);
+			InteractionType = EKIMInteractionTypes::NONE;
+		}
 		break;
 	case (EKIMInteractionTypes::OnRotation) :
 		if (Character->PickedUpItem) {
