@@ -13,12 +13,12 @@ AKIMCharacter::AKIMCharacter() {
 	CameraComponent->AddRelativeLocation(FVector(0, 0, 0));
 
 	ObjectAttachmentPoint = CreateDefaultSubobject<USceneComponent>(TEXT("InteractionObjectPoint"));
-	ObjectAttachmentPoint->AttachTo(RootComponent);
+	ObjectAttachmentPoint->AttachTo(CameraComponent);
 	ObjectAttachmentPoint->AddRelativeLocation(FVector(0, 0, 0));
 
 
 	// Rotate when the controller rotates
-	bUseControllerRotationPitch = true;
+	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
@@ -107,13 +107,15 @@ void AKIMCharacter::LookUp(float Value) {
 	if (IsInRoationState) {
 		return;
 	}
-	AddControllerPitchInput(Value * BaseLookRate * GetWorld()->GetDeltaSeconds());
+	CameraComponent->AddRelativeRotation(FRotator(Value * BaseLookRate * GetWorld()->GetDeltaSeconds(), 0, 0));
+	//AddControllerPitchInput(Value * BaseLookRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AKIMCharacter::LookRight(float Value) {
 	if (IsInRoationState) {
 		return;
 	}
+	//CameraComponent->AddRelativeRotation(FRotator(0, Value * BaseLookRate * GetWorld()->GetDeltaSeconds(), 0));
 	AddControllerYawInput(Value * BaseLookRate * GetWorld()->GetDeltaSeconds());
 }
 
