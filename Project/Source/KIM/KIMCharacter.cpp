@@ -25,7 +25,7 @@ AKIMCharacter::AKIMCharacter() {
 	InteractionDistance = 250.f;
 	BaseLookRate = 45.f;
 	BaseRotationRate = 45.f;
-	MovementSpeed = 100;
+	MovementSpeed = 1;
 	ThrowIntensity = 5000;
 	PickedUpItem = NULL;
 
@@ -48,21 +48,23 @@ void AKIMCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompon
 }
 
 void AKIMCharacter::MoveForward(float Value) {
-	if (Value < -0.1f || Value > 0.1f) {
+	if (Value < -0.09f || Value > 0.09f) {
 		if (IsInRoationState) {
-			RotateUp(Value);
+			RotateUp(Value * 10);
 			return;
 		}
+		UE_LOG(LogClass, Warning, TEXT("Value = %.2f"), Value);
 		if (PickedUpItem) {
-			if (Value < -0.1f) {
-				Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+			if (Value < -0.08f) {
+				Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, abs(Value));
 			}
-			else if (Value > 0.1f) {
-				Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+			else if (Value > 0.08f) {
+				Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, abs(Value));
 			}
 			else return;
 		}
-		Value *= abs(MovementSpeed / 100);
+		Value *= MovementSpeed; 
+		MovedForward(1 + 0.1*MovementSpeed);
 
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -75,22 +77,22 @@ void AKIMCharacter::MoveForward(float Value) {
 }
 
 void AKIMCharacter::MoveRight(float Value) {
-	if (Value < -0.1f || Value > 0.1f) {
+	if (Value < -0.09f || Value > 0.09f) {
 		if (IsInRoationState) {
-			RotateRight(Value);
+			RotateRight(Value*10);
 			return;
 		}
 		if (PickedUpItem) {
-			if (Value < -0.1f) {
-				Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+			if (Value < -0.09f) {
+				Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, abs(Value));
 			}
-			else if (Value > 0.1f) {
-				Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, Value * (Value / abs(Value)));
+			else if (Value > 0.09f) {
+				Value -= FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f,  abs(Value));
 			}
 			else return;
 		}
 
-		Value *= abs(MovementSpeed / 100);
+		Value *= MovementSpeed;
 
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
