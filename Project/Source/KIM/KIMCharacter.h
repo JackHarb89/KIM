@@ -31,7 +31,7 @@ public:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-		float MovementSpeed;
+		uint8 MovementSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float ThrowIntensity;
@@ -47,6 +47,8 @@ public:
 	
 	// Move
 	void MoveForward(float Value);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Camera")
+		void MovedForward(float Value);
 	void MoveRight(float Value);
 	
 	// Look

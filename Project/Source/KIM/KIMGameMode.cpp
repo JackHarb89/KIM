@@ -11,7 +11,7 @@ AKIMGameMode::AKIMGameMode(const FObjectInitializer& ObjectInitializer) : Super(
 	DefaultPawnClass = AKIMCharacter::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<AKIMCharacter> PlayerPawnBPClass(TEXT("/Game/Blueprint/Character_BP"));
+	static ConstructorHelpers::FClassFinder<AKIMCharacter> PlayerPawnBPClass(TEXT("/Game/Blueprint/Character/Character_BP"));
 	if (PlayerPawnBPClass.Class != NULL) {
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
