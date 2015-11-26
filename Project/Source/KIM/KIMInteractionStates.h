@@ -27,4 +27,6 @@ public:
 		FName Interaction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 		FName Dialogue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
+		USoundWave* Audio;
 };

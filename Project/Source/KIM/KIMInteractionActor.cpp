@@ -174,17 +174,18 @@ void AKIMInteractionActor::LerpToDesiredLocation(float DeltaSeconds) {
 
 
 void AKIMInteractionActor::GetInteractionDialogue(const FName Interaction) {
-	TArray<FName> Dialogues;
+	TArray<FKIMDialogue> Dialogues;
 	for (FKIMDialogue InteractionDialogue : DialogueTexts) {
 		if (InteractionDialogue.Interaction.Compare(Interaction) == 0) {
-			Dialogues.Add(InteractionDialogue.Dialogue);
+			Dialogues.Add(InteractionDialogue);
 		}
 	}
 
 	if (Dialogues.Num() == 0) {
-		StartDialogue(TEXT("No Dialogue found!"));
+		StartDialogue(TEXT("No Dialogue found!"),NULL);
 		return;
 	}
 
-	StartDialogue(Dialogues[FMath::RandRange(0, Dialogues.Num() - 1)]);
+	int32 RandomIndex = FMath::RandRange(0, Dialogues.Num() - 1);
+	StartDialogue(Dialogues[RandomIndex].Dialogue, Dialogues[RandomIndex].Audio);
 }

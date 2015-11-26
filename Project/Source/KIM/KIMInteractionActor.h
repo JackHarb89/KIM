@@ -89,7 +89,7 @@ public:
 		TArray<FKIMDialogue> DialogueTexts;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Dialogue")
-		void StartDialogue(const FName Dialogue);
+		void StartDialogue(const FName Dialogue, USoundWave* AudioWave);
 
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
 		void GetInteractionDialogue(const FName Interaction);
