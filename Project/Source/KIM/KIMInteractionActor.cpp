@@ -67,12 +67,13 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 	case (EKIMInteractionTypes::OnPressed) :
 		if (GetName().Contains("Control", ESearchCase::IgnoreCase) && IsDoorControlOpen && Character->IsBatteryAcquired){
 			PlacedBattery();
+			Character->IsBatteryAcquired = false;
 		}
 		else if (GetName().Contains("Control", ESearchCase::IgnoreCase)) {
-			Activated(NULL);
+			Activated(Component);
 		}
 		else if (GetName().Contains("Screw", ESearchCase::IgnoreCase) && Character->PickedUpItem && Character->PickedUpItem->GetName().Contains("ScrewDriver", ESearchCase::IgnoreCase)) {
-			Activated(NULL);
+			Activated(Component);
 		}
 		else if (GetName().Contains("Screw", ESearchCase::IgnoreCase)) {
 			GetInteractionDialogue("Press");
@@ -81,7 +82,7 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 			Activated(Component);
 		}
 		else if (GetName().Contains("Door", ESearchCase::IgnoreCase)) {
-			Activated(NULL);
+			Activated(Component);
 		}
 		break;
 	case (EKIMInteractionTypes::OnRotation) :

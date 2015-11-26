@@ -70,7 +70,8 @@ public:
 	void RotateUp(float Value);
 	void RotateRight(float Value);
 
-	bool IsInRoationState = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+		bool IsInRoationState = false;
 
 	void CheckTraceDistance();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
