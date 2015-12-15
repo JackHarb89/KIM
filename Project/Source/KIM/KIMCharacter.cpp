@@ -25,7 +25,7 @@ AKIMCharacter::AKIMCharacter() {
 	InteractionDistance = 250.f;
 	BaseLookRate = 45.f;
 	BaseRotationRate = 45.f;
-	MovementSpeed = 1;
+	MovementSpeed = 1;  
 	ThrowIntensity = 5000;
 	PickedUpItem = NULL;
 
