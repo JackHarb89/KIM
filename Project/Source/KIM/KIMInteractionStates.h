@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Blueprint/UserWidget.h"
 #include "KIMInteractionStates.generated.h"
 
 UENUM(BlueprintType)
@@ -29,4 +30,58 @@ public:
 		FName Dialogue;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 		USoundWave* Audio;
+};
+
+UENUM(BlueprintType)
+enum class EKIMConnectionColor : uint8 {
+	Normal	= 0		UMETA(DisplayName = "Normal"),
+	Blue	= 1		UMETA(DisplayName = "Blue"),
+	Green	= 2		UMETA(DisplayName = "Green"),
+	Red		= 3		UMETA(DisplayName = "Red"),
+};
+
+USTRUCT(BlueprintType)
+struct FKIMConnectionDirection {
+	GENERATED_USTRUCT_BODY()
+
+public:
+	FKIMConnectionDirection()
+		: UpConnection(false)
+		, DownConnection(false)
+		, RightConnection(false)
+		, LeftConnection(false) {
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnergyPuzzle")
+		bool UpConnection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnergyPuzzle")
+		bool DownConnection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnergyPuzzle")
+		bool RightConnection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnergyPuzzle")
+		bool LeftConnection;
+};
+
+USTRUCT(BlueprintType)
+struct FKIMGridControl {
+	GENERATED_USTRUCT_BODY()
+
+public:
+	FKIMGridControl()
+		: Module()
+		, Row(0)
+		, Column(0){
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnergyPuzzle")
+		UUserWidget* Module;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnergyPuzzle")
+		int32 Row;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnergyPuzzle")
+		int32 Column;
 };

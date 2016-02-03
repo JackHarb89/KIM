@@ -3,6 +3,7 @@
 #include "KIM.h"
 #include "KIMCharacter.h"
 #include "KIMInteractionActor.h"
+#include "KIMPlayerController.h"
 
 
 // Sets default values
@@ -150,6 +151,9 @@ void AKIMCharacter::ThrowObject() {
 // Called when the game starts or when spawned
 void AKIMCharacter::BeginPlay() {
 	Super::BeginPlay();
+	if (GetController()) {
+		((AKIMPlayerController*)GetController())->bShowMouseCursor = true;
+	}
 }
 
 // Called every frame
