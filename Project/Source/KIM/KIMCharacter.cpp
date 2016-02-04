@@ -151,9 +151,9 @@ void AKIMCharacter::ThrowObject() {
 // Called when the game starts or when spawned
 void AKIMCharacter::BeginPlay() {
 	Super::BeginPlay();
-	if (GetController()) {
-		((AKIMPlayerController*)GetController())->bShowMouseCursor = true;
-	}
+// 	if (GetController()) {
+// 		((AKIMPlayerController*)GetController())->bShowMouseCursor = true;
+// 	}
 }
 
 // Called every frame
