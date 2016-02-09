@@ -87,6 +87,18 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 		else if (GetName().Contains("Console", ESearchCase::IgnoreCase)) {
 			Activated(Component);
 		}
+		else if (GetName().Contains("Vent", ESearchCase::IgnoreCase) && Character->PickedUpItem && Character->PickedUpItem->GetName().Contains("DuctTape", ESearchCase::IgnoreCase)) {
+			Activated(Component, false);
+			Character->PickedUpItem->Destroy();
+			Character->PickedUpItem->DetachRootComponentFromParent(true);
+			Character->PickedUpItem = NULL;
+		}
+		else if (GetName().Contains("Vent", ESearchCase::IgnoreCase) && Character->PickedUpItem && Character->PickedUpItem->GetName().Contains("Blanket", ESearchCase::IgnoreCase)) {
+			Activated(Component, true);
+			Character->PickedUpItem->Destroy();
+			Character->PickedUpItem->DetachRootComponentFromParent(true);
+			Character->PickedUpItem = NULL;
+		}
 		break;
 	case (EKIMInteractionTypes::OnRotation) :
 		if (Character->PickedUpItem) {
@@ -106,7 +118,6 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 void AKIMInteractionActor::FinishCharging() {
 	InteractionType = EKIMInteractionTypes::OnPickUp;
 }
-
 
 void AKIMInteractionActor::AnimatePickUp(float DeltaSeconds) {
 	SetActorLocation(FMath::Lerp(GetActorLocation(), TargetTransform.GetLocation(), DeltaSeconds));
@@ -131,7 +142,6 @@ void AKIMInteractionActor::AnimateLayBack(float DeltaSeconds) {
 		UE_LOG(LogClass, Warning, TEXT("LayBack Animation Finished"));
 	}
 }
-
 
 void AKIMInteractionActor::LayBack(AKIMCharacter* Character) {
 	if (IsLerpingToDesiredRotation) {
@@ -174,7 +184,6 @@ void AKIMInteractionActor::LerpToDesiredLocation(float DeltaSeconds) {
 		UE_LOG(LogClass, Warning, TEXT("Rotated to desire"));
 	}
 }
-
 
 void AKIMInteractionActor::GetInteractionDialogue(const FName Interaction) {
 	TArray<FKIMDialogue> Dialogues;

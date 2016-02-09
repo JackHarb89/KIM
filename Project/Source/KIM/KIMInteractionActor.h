@@ -33,7 +33,7 @@ public:
 	AKIMInteractionActor* PickUpAbleItem = NULL;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
-		void Activated(UPrimitiveComponent* Component);
+		void Activated(UPrimitiveComponent* Component, bool IsBlanket = false);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Interaction")
 		void Thrown(float Intensity);
