@@ -99,6 +99,9 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 			Character->PickedUpItem->DetachRootComponentFromParent(true);
 			Character->PickedUpItem = NULL;
 		}
+		else if (GetName().Contains("Oven", ESearchCase::IgnoreCase)) {
+			Activated(Component);
+		}
 		break;
 	case (EKIMInteractionTypes::OnRotation) :
 		if (Character->PickedUpItem) {
