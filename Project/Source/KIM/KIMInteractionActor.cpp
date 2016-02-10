@@ -99,6 +99,12 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 			Character->PickedUpItem->DetachRootComponentFromParent(true);
 			Character->PickedUpItem = NULL;
 		}
+		else if (GetName().Contains("Vent", ESearchCase::IgnoreCase) && Character->PickedUpItem && Character->PickedUpItem->GetName().Contains("Socks", ESearchCase::IgnoreCase)) {
+			Activated(Component, false, true);
+			Character->PickedUpItem->Destroy();
+			Character->PickedUpItem->DetachRootComponentFromParent(true);
+			Character->PickedUpItem = NULL;
+		}
 		else if (GetName().Contains("Oven", ESearchCase::IgnoreCase)) {
 			Activated(Component);
 		}
