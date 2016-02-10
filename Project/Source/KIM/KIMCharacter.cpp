@@ -54,7 +54,6 @@ void AKIMCharacter::MoveForward(float Value) {
 			RotateUp(Value * 10);
 			return;
 		}
-		UE_LOG(LogClass, Warning, TEXT("Value = %.2f"), Value);
 		if (PickedUpItem) {
 			if (Value < -0.08f) {
 				Value += FMath::Clamp((((AKIMInteractionActor*)PickedUpItem)->Weight / 100), 0.f, abs(Value));
@@ -64,8 +63,8 @@ void AKIMCharacter::MoveForward(float Value) {
 			}
 			else return;
 		}
-		Value *= MovementSpeed; 
-		MovedForward(1 + 0.1*MovementSpeed);
+		//Value *= MovementSpeed; 
+		//MovedForward(1 + 0.1*MovementSpeed);
 
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -93,7 +92,7 @@ void AKIMCharacter::MoveRight(float Value) {
 			else return;
 		}
 
-		Value *= MovementSpeed;
+		//Value *= MovementSpeed;
 
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();

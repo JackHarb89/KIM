@@ -60,9 +60,9 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 		if (Character->PickedUpItem){
 			break;
 		}
+		PickedUp();
 		AttachRootComponentTo(Character->ObjectAttachmentPoint, NAME_None, (Character->IsItemSnapping ? EAttachLocation::SnapToTarget : EAttachLocation::KeepWorldPosition));
 		Character->PickedUpItem = this;
-		PickedUp();
 		break;
 	case (EKIMInteractionTypes::OnPressed) :
 		if (GetName().Contains("Control", ESearchCase::IgnoreCase) && IsDoorControlOpen && Character->IsBatteryAcquired){
