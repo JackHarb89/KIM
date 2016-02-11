@@ -60,9 +60,9 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 		if (Character->PickedUpItem){
 			break;
 		}
+		PickedUp();
 		AttachRootComponentTo(Character->ObjectAttachmentPoint, NAME_None, (Character->IsItemSnapping ? EAttachLocation::SnapToTarget : EAttachLocation::KeepWorldPosition));
 		Character->PickedUpItem = this;
-		PickedUp();
 		break;
 	case (EKIMInteractionTypes::OnPressed) :
 		if (GetName().Contains("Control", ESearchCase::IgnoreCase) && IsDoorControlOpen && Character->IsBatteryAcquired){
@@ -95,6 +95,12 @@ void AKIMInteractionActor::Interacted(AKIMCharacter* Character, UPrimitiveCompon
 		}
 		else if (GetName().Contains("Vent", ESearchCase::IgnoreCase) && Character->PickedUpItem && Character->PickedUpItem->GetName().Contains("Blanket", ESearchCase::IgnoreCase)) {
 			Activated(Component, true);
+			Character->PickedUpItem->Destroy();
+			Character->PickedUpItem->DetachRootComponentFromParent(true);
+			Character->PickedUpItem = NULL;
+		}
+		else if (GetName().Contains("Vent", ESearchCase::IgnoreCase) && Character->PickedUpItem && Character->PickedUpItem->GetName().Contains("Socks", ESearchCase::IgnoreCase)) {
+			Activated(Component, false, true);
 			Character->PickedUpItem->Destroy();
 			Character->PickedUpItem->DetachRootComponentFromParent(true);
 			Character->PickedUpItem = NULL;
